@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Replacement Visualizer | OS Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/global.css">
+  <link rel="stylesheet" href="../assets/css/glinto-theme.css">
+  <link rel="stylesheet" href="../assets/css/visualizer.css">
+</head>
+<body>
+  <header class="glinto-nav">
+    <div class="glinto-logo">Glinto · OS Lab</div>
+    <nav class="glinto-links">
+      <a href="../index.html">Home</a>
+      <a href="./replacement.html" class="active">Visualizer</a>
+      <a href="./about.html">Theory</a>
+      <button id="theme-toggle" class="editorial-btn editorial-btn-secondary" style="padding: 0.3rem 0.9rem; font-size: 0.78rem;">Theme</button>
+    </nav>
+  </header>
+
+  <main class="page-container">
+    <div style="margin-bottom: 1.75rem;">
+      <h1 style="font-size: 2.35rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.35rem; color: var(--accent-lime);">Virtual Memory Paging</h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">
+        Step-by-step two-phase eviction and fetch simulation between Secondary Storage (Disk) and Primary Memory (RAM).
+      </p>
+    </div>
+
+    <!-- Controls Bar -->
+    <div class="editorial-card" style="margin-bottom: 1.5rem;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem; margin-bottom: 1.15rem;">
+        <div>
+          <label style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 0.35rem;">Page Request Sequence</label>
+          <input type="text" id="ref-string" class="control-input" value="7 0 1 2 0 3 0 4 2 3 0 3 2 1 2 0 1 7">
+        </div>
+        <div>
+          <label style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 0.35rem;">RAM Frames (1–10)</label>
+          <input type="number" id="frame-count" class="control-input" min="1" max="10" value="3">
+        </div>
+        <div>
+          <label style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 0.35rem;">Replacement Policy</label>
+          <select id="algo-select" class="control-input">
+            <option value="FIFO">FIFO (First-In, First-Out)</option>
+            <option value="LRU">LRU (Least Recently Used)</option>
+            <option value="OPTIMAL">Optimal (MIN)</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 0.35rem;">Auto-Play Speed</label>
+          <select id="speed-select" class="control-input">
+            <option value="1150">0.75x (Slow)</option>
+            <option value="750" selected>1.0x (Normal)</option>
+            <option value="380">2.0x (Fast)</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 0.65rem; flex-wrap: wrap; align-items: center;">
+        <button id="simulate-btn" class="editorial-btn">Simulate</button>
+        <button id="init-btn" class="editorial-btn editorial-btn-secondary">Reset</button>
+        <button id="random-btn" class="editorial-btn editorial-btn-secondary">Random Input</button>
+        <button id="preset-btn" class="editorial-btn editorial-btn-secondary">Belady Preset</button>
+        <button id="compare-all-btn" class="editorial-btn editorial-btn-secondary" style="margin-left: auto;">Compare All 3</button>
+      </div>
+    </div>
+
+    <!-- Single-Algorithm Stage Wrapper (Hidden when "Compare All 3" is active) -->
+    <div id="single-sim-stage">
+      <!-- Main Dual-Memory Architecture Stage -->
+      <div class="editorial-card" style="margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+          <h3 style="font-size: 1.15rem; font-weight: 800;">Disk-to-RAM Memory Bus Simulation</h3>
+          <span id="step-indicator" class="badge">Step 0 / 18</span>
+        </div>
+
+        <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 0.4rem;">CPU Page Request Queue</span>
+        <div id="ref-sequence-strip" class="ref-sequence-strip"></div>
+
+        <!-- Left: Secondary Storage (Disk) | Center: Reversing Bus Arrow | Right: Primary Memory (RAM) -->
+        <div class="hardware-bus-stage">
+          <div class="hw-panel">
+            <div class="hw-panel-header">
+              <div class="hw-title-group">
+                <h4>Secondary Storage (Disk)</h4>
+                <p>Large backing store · Struck pages are currently in RAM</p>
+              </div>
+              <span id="disk-count-badge" class="capacity-pill">12 Pages</span>
+            </div>
+            <div class="hw-panel-body">
+              <div id="disk-pages-grid" class="disk-pages-grid"></div>
+            </div>
+          </div>
+
+          <div class="bus-transfer-zone">
+            <div id="flying-page-pill" class="flying-page-pill">Idle</div>
+            <svg id="bus-arrow-svg" class="bus-arrow-svg" width="116" height="44" viewBox="0 0 116 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path id="bus-arrow-shaft" d="M8 22 H104" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+              <path id="bus-arrow-head" d="M93 12 L105 22 L93 32" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span id="bus-direction-label" class="bus-direction-label">Disk &rarr; RAM Bus</span>
+          </div>
+
+          <div class="hw-panel">
+            <div class="hw-panel-header">
+              <div class="hw-title-group">
+                <h4>Primary Memory (RAM)</h4>
+                <p>Limited fast frames holding active pages</p>
+              </div>
+              <span id="ram-occupancy-badge" class="capacity-pill">0 / 3 Frames</span>
+            </div>
+            <div class="hw-panel-body">
+              <div id="ram-slots-stack" class="ram-slots-stack"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status Toast Banner -->
+        <div id="status-banner" class="status-banner">
+          <span>●</span>
+          <span id="status-text">Ready to begin simulation sequence.</span>
+        </div>
+
+        <!-- Step Navigation Buttons -->
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem;">
+          <button id="prev-step-btn" class="editorial-btn editorial-btn-secondary" disabled>&larr; Prev Step</button>
+          <button id="next-step-btn" class="editorial-btn">Next Step &rarr;</button>
+        </div>
+      </div>
+
+      <!-- Telemetry & Live Hit Accuracy Graph (Visible during single simulation, hidden in Compare All 3) -->
+      <div class="telemetry-graph-grid" style="margin-bottom: 1.5rem;">
+        <div class="editorial-card">
+          <h3 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 1rem;">Telemetry Metrics</h3>
+          <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+            <div style="display: flex; justify-content: space-between; padding-bottom: 0.65rem; border-bottom: 1px solid var(--border-color);">
+              <span style="color: var(--text-muted); font-size: 0.88rem;">Requested Page:</span>
+              <span id="tele-request" style="font-family: var(--font-mono); font-weight: 700;">-</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding-bottom: 0.65rem; border-bottom: 1px solid var(--border-color);">
+              <span style="color: var(--text-muted); font-size: 0.88rem;">Event Type:</span>
+              <span id="tele-status" style="font-weight: 700; font-size: 0.85rem;">Ready</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding-bottom: 0.65rem; border-bottom: 1px solid var(--border-color);">
+              <span style="color: var(--text-muted); font-size: 0.88rem;">Total Faults:</span>
+              <span id="tele-faults" style="font-family: var(--font-mono); font-weight: 700; color: var(--accent-red);">0</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding-bottom: 0.65rem; border-bottom: 1px solid var(--border-color);">
+              <span style="color: var(--text-muted); font-size: 0.88rem;">Total Hits:</span>
+              <span id="tele-hits" style="font-family: var(--font-mono); font-weight: 700; color: var(--accent-green);">0</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-muted); font-size: 0.88rem;">Hit Ratio:</span>
+              <span id="tele-ratio" style="font-family: var(--font-mono); font-weight: 800; color: var(--accent-lime);">0%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="editorial-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; flex-wrap: wrap; gap: 0.5rem;">
+            <h3 style="font-size: 1.05rem; font-weight: 800;">Live Hit Accuracy & Fault Rate Progression</h3>
+            <div style="display: flex; gap: 1rem; font-size: 0.78rem; font-weight: 700;">
+              <span style="color: var(--accent-lime);">● Hit Ratio (%)</span>
+              <span style="color: var(--accent-red);">--- Fault Rate (%)</span>
+            </div>
+          </div>
+          <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 0.75rem;">
+            Cumulative accuracy percentage updated dynamically after every executed step.
+          </p>
+          <div class="chart-canvas-wrapper">
+            <canvas id="accuracy-chart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Execution Matrix Log -->
+      <div class="editorial-card" style="margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 1rem;">Execution Matrix Log</h3>
+        <div id="matrix-container" style="overflow-x: auto;"></div>
+      </div>
+
+      <!-- Active Algorithm Rule / Complexity / Strength / Weakness -->
+      <div class="editorial-card">
+        <div style="font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-lime); margin-bottom: 0.85rem;" id="algo-spec-header">
+          Active Policy Specification: FIFO (First-In, First-Out)
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.9rem;">
+          <div style="padding: 0.9rem 1rem; background: var(--bg-surface-alt); border: 1px solid var(--border-color); border-radius: 10px;">
+            <span style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Rule</span>
+            <span id="spec-rule" style="font-size: 0.9rem; font-weight: 600;">Evict the oldest page in memory</span>
+          </div>
+          <div style="padding: 0.9rem 1rem; background: var(--bg-surface-alt); border: 1px solid var(--border-color); border-radius: 10px;">
+            <span style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Complexity</span>
+            <span id="spec-complexity" style="font-size: 0.9rem; font-weight: 600; font-family: var(--font-mono);">O(1) queue pop/push</span>
+          </div>
+          <div style="padding: 0.9rem 1rem; background: var(--bg-surface-alt); border: 1px solid var(--border-color); border-radius: 10px;">
+            <span style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--accent-green); display: block; margin-bottom: 0.25rem;">Strength</span>
+            <span id="spec-strength" style="font-size: 0.9rem; font-weight: 600;">Simplest to implement; minimal overhead</span>
+          </div>
+          <div style="padding: 0.9rem 1rem; background: var(--bg-surface-alt); border: 1px solid var(--border-color); border-radius: 10px;">
+            <span style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--accent-red); display: block; margin-bottom: 0.25rem;">Weakness</span>
+            <span id="spec-weakness" style="font-size: 0.9rem; font-weight: 600;">Ignores usage frequency; prone to Belady's anomaly</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compare All 3 Algorithms Section (Replaces Single Stage when active) -->
+    <div id="compare-all-section" class="editorial-card" style="display: none; margin-bottom: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+          <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--accent-lime);">Algorithm Comparison</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Side-by-side fault & hit ratio evaluation across FIFO, LRU, and Optimal.</p>
+        </div>
+        <button id="close-compare-btn" class="editorial-btn editorial-btn-secondary" style="padding: 0.35rem 0.9rem; font-size: 0.78rem;">Back to Simulation</button>
+      </div>
+
+      <div id="compare-bars-container" style="display: flex; flex-direction: column; gap: 0.9rem; margin-bottom: 1.25rem;"></div>
+      <div id="compare-analysis-box" style="padding: 0.9rem 1.1rem; background: var(--bg-surface-alt); border: 1px solid var(--border-color); border-radius: 10px; font-size: 0.9rem; margin-bottom: 1.25rem;"></div>
+
+      <div style="overflow-x: auto; margin-bottom: 1.75rem;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem; text-align: left;">
+          <thead>
+            <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-muted);">
+              <th style="padding: 0.7rem;">Algorithm</th>
+              <th style="padding: 0.7rem;">Faults</th>
+              <th style="padding: 0.7rem;">Hits</th>
+              <th style="padding: 0.7rem;">Hit ratio</th>
+              <th style="padding: 0.7rem;">Time per access</th>
+            </tr>
+          </thead>
+          <tbody id="compare-table-body"></tbody>
+        </table>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem;">
+        <div style="padding: 1.15rem; background: var(--bg-surface-alt); border: 1px solid var(--border-color); border-radius: 12px;">
+          <h4 style="font-size: 1rem; font-weight: 800; margin-bottom: 0.25rem;">Faults vs number of frames</h4>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.75rem;">Runs every algorithm for 1 to 8 frames. A rising FIFO line reveals Belady's anomaly.</p>
+          <div class="chart-canvas-wrapper" style="height: 250px;">
+            <canvas id="compare-faults-chart"></canvas>
+          </div>
+          <div style="display: flex; gap: 1.25rem; margin-top: 0.6rem; font-size: 0.78rem; font-weight: 700;">
+            <span style="color: #fbbf24;">■ FIFO</span>
+            <span style="color: #9ca39e;">■ LRU</span>
+            <span style="color: #4ade80;">■ Optimal</span>
+          </div>
+        </div>
+
+        <div style="padding: 1.15rem; background: var(--bg-surface-alt); border: 1px solid var(--border-color); border-radius: 12px;">
+          <h4 style="font-size: 1rem; font-weight: 800; margin-bottom: 0.25rem;">Hit ratio (%) vs number of frames</h4>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.75rem;">Higher curves indicate better RAM cache efficiency as physical memory expands.</p>
+          <div class="chart-canvas-wrapper" style="height: 250px;">
+            <canvas id="compare-hitratio-chart"></canvas>
+          </div>
+          <div style="display: flex; gap: 1.25rem; margin-top: 0.6rem; font-size: 0.78rem; font-weight: 700;">
+            <span style="color: #fbbf24;">■ FIFO</span>
+            <span style="color: #9ca39e;">■ LRU</span>
+            <span style="color: #4ade80;">■ Optimal</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="../js/replacement/stepper.js"></script>
+  <script src="../assets/js/theme.js"></script>
+</body>
+</html>

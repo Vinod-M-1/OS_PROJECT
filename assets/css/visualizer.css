@@ -1,0 +1,379 @@
+/* Top Reference Sequence Strip */
+.ref-sequence-strip {
+  display: flex;
+  gap: 0.45rem;
+  overflow-x: auto;
+  padding: 0.75rem 1rem;
+  background: var(--bg-surface-alt);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  margin-bottom: 1.25rem;
+}
+
+.seq-chip {
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+  flex-shrink: 0;
+  transition: all 0.25s ease;
+}
+
+.seq-chip.seq-past {
+  opacity: 0.5;
+}
+
+.seq-chip.seq-current {
+  background: var(--accent-lime);
+  color: var(--accent-lime-dark);
+  border-color: var(--accent-lime);
+  transform: scale(1.05);
+}
+
+/* Main Dual-Memory Architecture Stage */
+.hardware-bus-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) 160px minmax(0, 1fr);
+  gap: 0.5rem;
+  align-items: stretch;
+  padding: 1.25rem;
+  background: var(--bg-surface-alt);
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 920px) {
+  .hardware-bus-stage {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .bus-transfer-zone {
+    min-height: 80px !important;
+  }
+}
+
+.hw-panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.hw-panel-header {
+  background: var(--bg-slot);
+  color: var(--text-primary);
+  padding: 0.85rem 1.15rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.hw-title-group h4 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--accent-lime);
+  line-height: 1.2;
+}
+
+.hw-title-group p {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.capacity-pill {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.hw-panel-body {
+  padding: 1.1rem;
+  flex: 1;
+}
+
+/* Left Panel: Secondary Storage (Disk) Grid */
+.disk-pages-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 0.6rem;
+}
+
+.disk-page-block {
+  position: relative;
+  padding: 0.65rem 0.5rem;
+  border-radius: 10px;
+  background: var(--bg-surface-alt);
+  border: 1px solid var(--border-color);
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.disk-page-block .disk-sub {
+  font-size: 0.64rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+/* Struck-through state when page is currently loaded in RAM */
+.disk-page-block.in-ram-struck {
+  opacity: 0.45;
+  background: transparent;
+  border: 1px dashed var(--border-color);
+}
+
+.disk-page-block.in-ram-struck .page-title-text {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--accent-red);
+  color: var(--text-muted);
+}
+
+.disk-page-block.in-ram-struck .disk-sub {
+  color: var(--accent-lime);
+}
+
+/* Highlight restored block when evicted back to Disk */
+.disk-page-block.just-restored {
+  border: 1.5px solid var(--accent-amber);
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.25);
+}
+
+/* Center Bus Transfer Zone & Bi-Directional Arrow Animation */
+.bus-transfer-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 0.5rem;
+}
+
+.flying-page-pill {
+  padding: 0.45rem 0.95rem;
+  border-radius: 9999px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 800;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  border: 1.5px solid var(--border-color);
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+  text-align: center;
+  min-width: 105px;
+}
+
+.bus-arrow-svg {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bus-arrow-svg.reversed {
+  transform: rotate(180deg);
+}
+
+@keyframes flyDiskToRam {
+  0% {
+    opacity: 0;
+    transform: translateX(-34px) scale(0.88);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes flyRamToDisk {
+  0% {
+    opacity: 0;
+    transform: translateX(34px) scale(0.88);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes pulseCacheHit {
+  0% { transform: scale(0.92); }
+  50% { transform: scale(1.07); }
+  100% { transform: scale(1); }
+}
+
+.flying-page-pill.animate-fetch {
+  background: var(--accent-lime);
+  color: var(--accent-lime-dark);
+  border-color: var(--accent-lime);
+  animation: flyDiskToRam 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.flying-page-pill.animate-evict {
+  background: rgba(251, 191, 36, 0.16);
+  color: var(--accent-amber);
+  border-color: var(--accent-amber);
+  animation: flyRamToDisk 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.flying-page-pill.animate-hit {
+  background: rgba(74, 222, 128, 0.16);
+  color: var(--accent-green);
+  border-color: var(--accent-green);
+  animation: pulseCacheHit 0.4s ease forwards;
+}
+
+.bus-direction-label {
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-top: 0.4rem;
+  text-align: center;
+}
+
+/* Right Panel: Primary Memory (RAM) Slots */
+.ram-slots-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.frame-slot-row {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.frame-index-label {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.frame-pill {
+  height: 38px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  font-weight: 700;
+  background: var(--bg-surface-alt);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.frame-pill.empty-slot {
+  background: transparent;
+  border: 1.5px dashed var(--border-color);
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.frame-pill.slot-evicting {
+  background: rgba(251, 191, 36, 0.14);
+  border: 1.5px dashed var(--accent-amber);
+  color: var(--accent-amber);
+}
+
+.frame-pill.slot-hit {
+  background: rgba(74, 222, 128, 0.15);
+  border: 2px solid var(--accent-green);
+  color: var(--accent-green);
+}
+
+.frame-pill.slot-fault {
+  background: rgba(227, 246, 200, 0.15);
+  border: 2px solid var(--accent-lime);
+  color: var(--accent-lime);
+}
+
+/* Status Banner */
+.status-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.15rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  background: var(--bg-surface-alt);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  transition: all 0.25s ease;
+}
+
+.status-banner.hit-banner {
+  border-color: rgba(74, 222, 128, 0.4);
+  color: var(--accent-green);
+}
+
+.status-banner.evict-banner {
+  border-color: rgba(251, 191, 36, 0.45);
+  color: var(--accent-amber);
+}
+
+.status-banner.fault-banner {
+  border-color: rgba(227, 246, 200, 0.45);
+  color: var(--accent-lime);
+}
+
+/* Telemetry & Graph Grid */
+.telemetry-graph-grid {
+  display: grid;
+  grid-template-columns: 310px minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+@media (max-width: 900px) {
+  .telemetry-graph-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.chart-canvas-wrapper {
+  position: relative;
+  width: 100%;
+  height: 270px;
+  overflow: hidden;
+}
+
+.chart-canvas-wrapper canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}

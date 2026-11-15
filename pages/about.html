@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Replacement Theory | OS Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/global.css">
+  <link rel="stylesheet" href="../assets/css/glinto-theme.css">
+  <link rel="stylesheet" href="../assets/css/visualizer.css">
+</head>
+<body>
+  <header class="glinto-nav">
+    <div class="glinto-logo">Glinto · OS Lab</div>
+    <nav class="glinto-links">
+      <a href="../index.html">Home</a>
+      <a href="./replacement.html">Visualizer</a>
+      <a href="./about.html" class="active">Theory</a>
+      <button id="theme-toggle" class="editorial-btn editorial-btn-secondary" style="padding: 0.3rem 0.9rem; font-size: 0.78rem;">Theme</button>
+    </nav>
+  </header>
+
+  <main class="page-container">
+    <div style="margin-bottom: 2rem;">
+      <h1 style="font-size: 2.35rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.4rem; color: var(--accent-lime);">
+        Page Replacement Theory & Analytics
+      </h1>
+      <p style="color: var(--text-muted); font-size: 0.98rem;">
+        Complete conceptual breakdown from real-world intuition to algorithmic benchmarks and Belady's Anomaly proofs.
+      </p>
+    </div>
+
+    <!-- Section 1: Real-World Analogy -->
+    <section class="editorial-card" style="margin-bottom: 1.5rem;">
+      <h2 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.85rem; color: var(--accent-lime);">
+        1. The Real-World Study Desk Analogy
+      </h2>
+      <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 1rem;">
+        Imagine studying at a small desk that only holds 3 books at once, while your bookshelf across the room stores hundreds of books:
+      </p>
+      <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.92rem;">
+        <li style="padding: 0.8rem 1rem; background: var(--bg-surface-alt); border: 1px solid var(--border-color); border-radius: 10px;">
+          <strong style="color: var(--accent-green);">Page Hit:</strong> You need a book and it is already sitting on your desk—instant access with zero delay.
+        </li>
+        <li style="padding: 0.8rem 1rem; background: var(--bg-surface-alt); border: 1px solid var(--border-color); border-radius: 10px;">
+          <strong style="color: var(--accent-red);">Page Fault:</strong> The book is not on your desk. You must walk to the bookshelf, retrieve it, and bring it back (slow disk I/O).
+        </li>
+        <li style="padding: 0.8rem 1rem; background: var(--bg-surface-alt); border: 1px solid var(--border-color); border-radius: 10px;">
+          <strong style="color: var(--accent-amber);">Eviction Policy:</strong> When your desk is full, you must choose which book to return to the shelf to make space.
+        </li>
+      </ul>
+    </section>
+
+    <!-- Section 2: Hardware Mapping -->
+    <section class="editorial-card" style="margin-bottom: 1.5rem;">
+      <h2 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 1rem; color: var(--accent-lime);">
+        2. Mapping Analogy to Operating System Hardware
+      </h2>
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left;">
+          <thead>
+            <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-muted);">
+              <th style="padding: 0.75rem;">Real-World Concept</th>
+              <th style="padding: 0.75rem;">OS Equivalent</th>
+              <th style="padding: 0.75rem;">System Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid var(--border-color);">
+              <td style="padding: 0.75rem; font-weight: 700;">Study Desk</td>
+              <td style="padding: 0.75rem; font-family: var(--font-mono); color: var(--accent-lime);">Physical RAM</td>
+              <td style="padding: 0.75rem; color: var(--text-muted);">High-speed volatile memory divided into fixed-size frames.</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-color);">
+              <td style="padding: 0.75rem; font-weight: 700;">Bookshelf</td>
+              <td style="padding: 0.75rem; font-family: var(--font-mono); color: var(--accent-lime);">Secondary Storage (SSD/Disk)</td>
+              <td style="padding: 0.75rem; color: var(--text-muted);">Large backing store holding inactive virtual pages.</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-color);">
+              <td style="padding: 0.75rem; font-weight: 700;">Individual Book</td>
+              <td style="padding: 0.75rem; font-family: var(--font-mono); color: var(--accent-lime);">Virtual Page</td>
+              <td style="padding: 0.75rem; color: var(--text-muted);">Fixed-size block of a process's virtual address space.</td>
+            </tr>
+            <tr>
+              <td style="padding: 0.75rem; font-weight: 700;">Walking to Shelf</td>
+              <td style="padding: 0.75rem; font-family: var(--font-mono); color: var(--accent-red);">Page Fault Interrupt</td>
+              <td style="padding: 0.75rem; color: var(--text-muted);">MMU trap requiring a slow transfer across the RAM system bus.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 3: Algorithm Comparison Matrix -->
+    <section class="editorial-card" style="margin-bottom: 1.5rem;">
+      <h2 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 1rem; color: var(--accent-lime);">
+        3. Algorithm Comparison Matrix (Classic 20-Reference Benchmark, 3 Frames)
+      </h2>
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left;">
+          <thead>
+            <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-muted);">
+              <th style="padding: 0.75rem;">Metric</th>
+              <th style="padding: 0.75rem;">FIFO</th>
+              <th style="padding: 0.75rem;">LRU</th>
+              <th style="padding: 0.75rem;">Optimal (MIN)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid var(--border-color);">
+              <td style="padding: 0.75rem; font-weight: 700;">Eviction Rule</td>
+              <td style="padding: 0.75rem;">Oldest arrival in memory</td>
+              <td style="padding: 0.75rem;">Longest time since last access</td>
+              <td style="padding: 0.75rem;">Farthest future reference</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-color);">
+              <td style="padding: 0.75rem; font-weight: 700;">Temporal Locality</td>
+              <td style="padding: 0.75rem; color: var(--text-muted);">Ignored</td>
+              <td style="padding: 0.75rem; color: var(--accent-green);">Exploited</td>
+              <td style="padding: 0.75rem; color: var(--accent-green);">Exact future lookahead</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-color);">
+              <td style="padding: 0.75rem; font-weight: 700;">Belady's Anomaly</td>
+              <td style="padding: 0.75rem; color: var(--accent-red); font-weight: 700;">Vulnerable</td>
+              <td style="padding: 0.75rem; color: var(--accent-green); font-weight: 700;">Immune (Stack Algo)</td>
+              <td style="padding: 0.75rem; color: var(--accent-green); font-weight: 700;">Immune (Stack Algo)</td>
+            </tr>
+            <tr>
+              <td style="padding: 0.75rem; font-weight: 700;">Practicality</td>
+              <td style="padding: 0.75rem;">Low overhead, poor accuracy</td>
+              <td style="padding: 0.75rem;">Industry standard approximation</td>
+              <td style="padding: 0.75rem;">Theoretical benchmark only</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 4: Belady's Anomaly Demonstration -->
+    <section class="editorial-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.75rem;">
+        <h2 style="font-size: 1.2rem; font-weight: 800; color: var(--accent-lime);">
+          4. Belady's Anomaly Demonstration (Frames 1–8)
+        </h2>
+        <div style="display: flex; gap: 1.15rem; font-size: 0.82rem; font-weight: 700;">
+          <span style="color: #fbbf24;">● FIFO</span>
+          <span style="color: #9ca39e;">● LRU</span>
+          <span style="color: #4ade80;">● Optimal</span>
+        </div>
+      </div>
+
+      <div class="chart-canvas-wrapper" style="height: 270px; margin-bottom: 1rem;">
+        <canvas id="belady-theory-chart"></canvas>
+      </div>
+
+      <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">
+        Evaluated on reference string <code style="font-family: var(--font-mono); color: var(--accent-lime); background: var(--bg-surface-alt); padding: 0.15rem 0.45rem; border-radius: 6px;">1 2 3 4 1 2 5 1 2 3 4 5</code>. Notice how FIFO jumps from <strong style="color: var(--text-primary);">9 faults at 3 frames</strong> up to <strong style="color: var(--accent-red);">10 faults at 4 frames</strong>—proving that adding physical RAM can worsen performance under non-stack replacement policies.
+      </p>
+    </section>
+  </main>
+
+  <script type="module">
+    import { renderBeladyComparisonChart } from '../assets/js/live-graph.js';
+
+    const beladyRef = [1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5];
+
+    function drawChart() {
+      renderBeladyComparisonChart('belady-theory-chart', beladyRef, 4, 'faults');
+    }
+
+    document.addEventListener('DOMContentLoaded', drawChart);
+    window.addEventListener('resize', drawChart);
+    window.addEventListener('themeChanged', drawChart);
+  </script>
+  <script src="../assets/js/theme.js"></script>
+</body>
+</html>

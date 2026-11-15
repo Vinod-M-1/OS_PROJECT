@@ -1,0 +1,141 @@
+/* Compact Sticky Navigation Bar */
+.glinto-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.7rem 2rem;
+  height: 56px;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.glinto-logo {
+  font-weight: 800;
+  font-size: 1.15rem;
+  letter-spacing: -0.04em;
+  color: var(--accent-lime);
+}
+
+.glinto-links {
+  display: flex;
+  gap: 1.75rem;
+  align-items: center;
+}
+
+.glinto-links a {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.glinto-links a:hover,
+.glinto-links a.active {
+  color: var(--accent-lime);
+}
+
+/* Containers & Cards */
+.page-container {
+  width: 100%;
+  max-width: 1220px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.editorial-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1.5rem;
+  min-width: 0;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+/* Unified Button System (All buttons share the exact same Glinto pill design) */
+.editorial-btn {
+  background: var(--accent-lime);
+  color: var(--accent-lime-dark);
+  border: 1px solid var(--accent-lime);
+  padding: 0.62rem 1.35rem;
+  font-weight: 700;
+  font-size: 0.84rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  white-space: nowrap;
+}
+
+.editorial-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.editorial-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.editorial-btn-secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.editorial-btn-secondary:hover:not(:disabled) {
+  border-color: var(--accent-lime);
+  color: var(--accent-lime);
+  background: rgba(227, 246, 200, 0.06);
+}
+
+.control-input {
+  width: 100%;
+  background: var(--bg-surface-alt);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 0.65rem 0.9rem;
+  border-radius: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.control-input:focus {
+  border-color: var(--accent-lime);
+}
+
+.badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+}
+
+.badge-hit {
+  background: rgba(74, 222, 128, 0.12);
+  color: var(--accent-green);
+  border-color: rgba(74, 222, 128, 0.35);
+}
+
+.badge-fault {
+  background: rgba(248, 113, 113, 0.12);
+  color: var(--accent-red);
+  border-color: rgba(248, 113, 113, 0.35);
+}
+
+.badge-evict {
+  background: rgba(251, 191, 36, 0.14);
+  color: var(--accent-amber);
+  border-color: rgba(251, 191, 36, 0.38);
+}

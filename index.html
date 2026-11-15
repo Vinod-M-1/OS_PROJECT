@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Glinto · OS Concept Visualization Suite</title>
+  <link rel="stylesheet" href="./assets/css/global.css">
+  <link rel="stylesheet" href="./assets/css/glinto-theme.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="glinto-nav">
+    <div class="glinto-logo">Glinto · OS Lab</div>
+    <nav class="glinto-links">
+      <a href="./index.html" class="active">Home</a>
+      <a href="./pages/replacement.html">Visualizer</a>
+      <a href="./pages/about.html">Theory</a>
+      <button id="theme-toggle" class="editorial-btn editorial-btn-secondary" style="padding: 0.3rem 0.9rem; font-size: 0.78rem;">Theme</button>
+    </nav>
+  </header>
+
+  <main class="page-container" style="max-width: 980px; padding-top: 4.5rem;">
+    <div style="margin-bottom: 3.5rem;">
+      <h1 style="font-size: clamp(2.8rem, 6vw, 4.5rem); font-weight: 800; letter-spacing: -0.04em; line-height: 1.05; color: var(--accent-lime); margin-bottom: 1.1rem;">
+        OS Visualizer.
+      </h1>
+      <p style="color: var(--text-primary); font-size: 1.25rem; max-width: 580px; line-height: 1.5; font-weight: 400;">
+        Interactive virtual memory simulation for identity, bus transfers, and paging algorithms.
+      </p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+      <div class="editorial-card" style="display: flex; flex-direction: column; justify-content: space-between; gap: 1.5rem;">
+        <div>
+          <span class="badge badge-hit" style="display: inline-block; margin-bottom: 0.75rem;">INTERACTIVE LAB</span>
+          <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem;">Page Replacement Visualizer</h3>
+          <p style="color: var(--text-muted); font-size: 0.92rem;">
+            Step through two-phase eviction and fetch cycles across FIFO, LRU, and Optimal policies with live RAM frame slots and comparative metrics.
+          </p>
+        </div>
+        <a href="./pages/replacement.html" class="editorial-btn" style="width: 100%;">Launch Visualizer &rarr;</a>
+      </div>
+
+      <div class="editorial-card" style="display: flex; flex-direction: column; justify-content: space-between; gap: 1.5rem;">
+        <div>
+          <span class="badge badge-evict" style="display: inline-block; margin-bottom: 0.75rem;">CONCEPTS & PROOFS</span>
+          <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem;">Theory & Belady's Anomaly</h3>
+          <p style="color: var(--text-muted); font-size: 0.92rem;">
+            Explore virtual memory hardware mappings, side-by-side algorithmic complexity tables, and interactive multi-frame fault curves.
+          </p>
+        </div>
+        <a href="./pages/about.html" class="editorial-btn editorial-btn-secondary" style="width: 100%;">Explore Theory &rarr;</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="./assets/js/theme.js"></script>
+</body>
+</html>

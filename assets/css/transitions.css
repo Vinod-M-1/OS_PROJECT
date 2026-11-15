@@ -1,0 +1,41 @@
+.bus-stage-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+@media(max-width: 900px) {
+  .bus-stage-grid { grid-template-columns: 1fr; }
+}
+
+.ram-frame-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+.ram-frame-row.highlight-slot {
+  border-color: var(--accent-green);
+  background: var(--accent-glow);
+}
+
+.bus-packet-box {
+  width: 90px;
+  height: 60px;
+  background: var(--bg-primary);
+  border: 2px solid var(--accent-green);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0 auto;
+}
